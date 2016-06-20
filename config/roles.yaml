@@ -1,0 +1,61 @@
+---
+roles:
+  primary:
+    private_networks:
+      - ip: '10.20.1.80'
+        auto_network: true
+    providers:
+      - type: virtualbox
+        customize:
+          - [modifyvm, !ruby/sym id, '--memory', 4096]
+          - [modifyvm, !ruby/sym id, '--ioapic', 'on']
+          - [modifyvm, !ruby/sym id, '--cpus', '4']
+    provisioners:
+      - type: hosts
+      - type: shell
+        inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+      - type: shell
+        inline: "service iptables stop"
+      - type: shell
+        inline: 'localectl set-locale LANG=ja_JP.UTF-8'
+      - type: pe_bootstrap
+        role: !ruby/sym master
+        answer_file: answers.txt
+        autosign: false
+      - type: shell
+        inline: "/opt/puppetlabs/puppet/bin/gem install puppetclassify --no-ri --no-rdoc"
+      - type: shell
+        inline: "/opt/puppetlabs/puppet/bin/ruby /vagrant/scripts/boot.rb"
+
+
+  posix_agent:
+    private_networks:
+      - {ip: '0.0.0.0', auto_network: true}
+    provisioners:
+      - {type: shell, inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"}
+      - {type: hosts}
+      - type: shell
+        inline: |-
+          mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
+          curl -sk https://master.puppet.vm:8140/packages/current/install.bash | /bin/bash 
+ 
+  windows_agent:
+    communicator: winrm
+    forwarded_ports:
+          - { guest: 5985, host: 35985, auto_correct: true }
+          - { guest: 3389, host: 33389, auto_correct: true }
+    private_networks:
+      - {ip: '0.0.0.0', auto_network: true}
+    provisioners:
+      - type: hosts
+      - type: shell
+        inline: 'Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "0"'
+      # The reload is important. It needs to happen for the name, domain, and
+      # registry changes to take effect.
+      - type: reload
+      # Install the windows puppet agent using a PowerShell script. The
+      # install_agent.ps1 script will set the agent certname it reads from
+      # the system. The hosts provisioner should have configured these things
+      # prior to the reboot.
+      - type: shell
+        path: "scripts/install_agent.ps1"

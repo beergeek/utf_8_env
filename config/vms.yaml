@@ -1,0 +1,31 @@
+---
+vms:
+  - name: "master.puppet.vm"
+    box:  "puppetlabs/centos-7.0-64-nocm"
+    roles: [ "primary" ]
+    autostart: true
+
+  - name: "node0.puppet.vm"
+    box:  "puppetlabs/centos-6.6-64-nocm"
+    roles: [ "posix_agent" ]
+    autostart: true
+
+  - name: "node1.puppet.vm"
+    box:  "puppetlabs/centos-7.0-64-nocm"
+    roles: [ "posix_agent" ]
+    autostart: true
+
+  - name: "node2.puppet.vm"
+    box: "puppetlabs/centos-6.6-64-nocm"
+    roles: [ "posix_agent" ]
+    autostart: false
+
+  - name: "win0.puppet.vm"
+    box: "windows-server-2008-r2-x64-v2"
+    roles: [ "windows_agent" ]
+    autostart: false
+
+  - name: "win1.puppet.vm"
+    box: "windows-server-2012r2-v3"
+    roles: [ "windows_agent" ]
+    autostart: false
