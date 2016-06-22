@@ -15,17 +15,21 @@ roles:
       - type: shell
         inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
       - type: shell
-        inline: "service iptables stop"
+        inline: "systemctl stop firewalld"
       - type: shell
-        inline: 'localectl set-locale LANG=ja_JP.UTF-8'
+        inline: "systemctl disable firewalld"
+      - type: shell
+        inline: 'localectl set-locale LANG=en_US.utf8'
       - type: pe_bootstrap
         role: !ruby/sym master
-        answer_file: answers.txt
-        autosign: false
+        answer_file: pe.conf
+        autosign: true
       - type: shell
         inline: "/opt/puppetlabs/puppet/bin/gem install puppetclassify --no-ri --no-rdoc"
       - type: shell
         inline: "/opt/puppetlabs/puppet/bin/ruby /vagrant/scripts/boot.rb"
+      - type: shell
+        inline: "/opt/puppetlabs/bin/puppet agent -t; true"
 
 
   posix_agent:

@@ -110,6 +110,27 @@ def new_groups()
   create_group("データベース・グループ",'937f05eb-8185-4517-a609-3e64d05191ca',db_group,["and", ["~", ["fact","pp_role"],'db_サーバ']],'All Nodes')
 end
 
+def change_classification()
+  cputs "Update Node Groups"
+  master_rule = ["and",["=","name","master.puppet.vm"]]
+  master_classes = {
+    'pe_repo' => {},
+    'pe_repo::platform::el_7_x86_64' => {},
+    'pe_repo::platform::el_6_x86_64' => {},
+    'pe_repo::platform::ubuntu_1604_amd64' => {},
+    'pe_repo::platform::windows_x86_64' => {},
+    'puppet_enterprise::profile::master' => {},
+    'puppet_enterprise::profile::master::mcollective' => {},
+    'puppet_enterprise::profile::mcollective::peadmin' => {}
+  }
+
+  update_node_group(
+    "PE Master",
+    master_rule,
+    master_classes
+  )
+
+end
 
 def update_node_group(node_group,rule,classes)
   cputs "Update Node Group #{node_group}"
@@ -128,3 +149,4 @@ end
 
 config_r10k('https://github.com/beergeek/japan_test.git')
 new_groups()
+change_classification()
