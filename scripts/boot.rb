@@ -103,11 +103,11 @@ def new_groups()
     'role::db_server' => {}
   }
   #Web Group
-  create_group("ウェブ・グループ",'937f05eb-8185-4517-a609-3e64d05191c2',web_group,["and", ["~", ["fact","pp_role"],'ウェブ_サーバ']],"All Nodes")
+  create_group("ウェブ・グループ",'937f05eb-8185-4517-a609-3e64d05191c2',web_group,["or",["=",["trusted","extensions","pp_role"],"ウェブ_サーバ"],["~",["fact","pp_role"],"ウェブ_サーバ"]],"All Nodes")
   #Application Group
-  create_group("アプリケーション・グループ",'937f05eb-8185-4517-a609-3e64d05191c1',app_group,["and",["~",["fact","pp_role"],'アプリ_サーバ']],'All Nodes')
+  create_group("アプリケーション・グループ",'937f05eb-8185-4517-a609-3e64d05191c1',app_group,["or",["=",["trusted","extensions","pp_role"],"アプリ_サーバ"],["~",["fact","pp_role"],"アプリ_サーバ"]],'All Nodes')
   #Databse Group
-  create_group("データベース・グループ",'937f05eb-8185-4517-a609-3e64d05191ca',db_group,["and", ["~", ["fact","pp_role"],'db_サーバ']],'All Nodes')
+  create_group("データベース・グループ",'937f05eb-8185-4517-a609-3e64d05191ca',db_group,["and",["=",["trusted","extensions","pp_role"],"db_サーバ"],["~",["fact","pp_role"],"db_サーバ"]],'All Nodes')
 end
 
 def change_classification()
