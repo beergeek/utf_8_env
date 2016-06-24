@@ -7,17 +7,17 @@ vms:
 
   - name: "node0.puppet.vm"
     box:  "puppetlabs/centos-6.6-64-nocm"
-    roles: [ "posix_agent_web" ]
+    roles: [ "posix_agent" ]
     autostart: true
 
   - name: "node1.puppet.vm"
     box:  "puppetlabs/centos-7.0-64-nocm"
-    roles: [ "posix_agent_app" ]
+    roles: [ "posix_agent" ]
     autostart: true
 
   - name: "node2.puppet.vm"
     box: "puppetlabs/ubuntu-16.04-64-nocm"
-    roles: [ "posix_agent_db" ]
+    roles: [ "posix_agent" ]
     autostart: false
 
   - name: "win0.puppet.vm"

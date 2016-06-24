@@ -25,14 +25,23 @@ roles:
         answer_file: pe.conf
         autosign: true
       - type: shell
-        inline: "/opt/puppetlabs/puppet/bin/gem install puppetclassify --no-ri --no-rdoc"
+        inline: |-
+          "cp /vagrant/hiera.yaml /etc/puppetlabs/puppet/hiera.yaml"
+          "/opt/puppetlabs/puppet/bin/gem install puppetclassify hiera-eyaml --no-ri --no-rdoc"
+          "/opt/puppetlabs/bin/puppetserver gem install hiera-eyaml --no-ri --no-rdoc"
+          "cp /vagrant/b /etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem"
+          "echo '-----BEGIN RSA PRIVATE KEY-----' > /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
+          "cat /vagrant/a >> /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
+          "echo '-----END RSA PRIVATE KEY-----' >> /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
+          "chown pe-puppet:pe-puppet /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
+          "systemctl restart pe-puppetserver"
       - type: shell
         inline: "/opt/puppetlabs/puppet/bin/ruby /vagrant/scripts/boot.rb"
       - type: shell
         inline: "/opt/puppetlabs/bin/puppet agent -t; true"
 
 
-  posix_agent_web:
+  posix_agent:
     private_networks:
       - {ip: '0.0.0.0', auto_network: true}
     provisioners:
@@ -42,30 +51,6 @@ roles:
         inline: |-
           mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
           cp /vagrant/web_server.attributes /etc/puppetlabs/puppet/csr_attributes.yaml
-          curl -sk https://master.puppet.vm:8140/packages/current/install.bash | /bin/bash
-
-  posix_agent_app:
-    private_networks:
-      - {ip: '0.0.0.0', auto_network: true}
-    provisioners:
-      - {type: shell, inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"}
-      - {type: hosts}
-      - type: shell
-        inline: |-
-          mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
-          cp /vagrant/app_server.attributes /etc/puppetlabs/puppet/csr_attributes.yaml
-          curl -sk https://master.puppet.vm:8140/packages/current/install.bash | /bin/bash
-
-  posix_agent_db:
-    private_networks:
-      - {ip: '0.0.0.0', auto_network: true}
-    provisioners:
-      - {type: shell, inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"}
-      - {type: hosts}
-      - type: shell
-        inline: |-
-          mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
-          cp /vagrant/db_server.attribute /etc/puppetlabs/puppet/csr_attributes.yaml
           curl -sk https://master.puppet.vm:8140/packages/current/install.bash | /bin/bash
 
   windows_agent:

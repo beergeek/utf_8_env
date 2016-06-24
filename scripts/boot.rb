@@ -92,15 +92,22 @@ end
 def new_groups()
   cputs = "Making New Node Groups"
   web_group = {
-    'role::web_server' => {}
+    'role::base' => {
+      'ensure_japanase_files' => false,
+      'ensure_japanese_group' => false,
+      'ensure_japanese_host' => false,
+      'ensure_japanese_users' => false,
+      'ensure_japanse_concat' => false,
+      'japanese_notify_string' => 'こんにちは',
+    }
   }
 
   app_group = {
-    'role::app_server' => {}
+    'role::base' => {}
   }
 
   db_group = {
-    'role::db_server' => {}
+    'role::base' => {}
   }
   #Web Group
   create_group("ウェブ・グループ",'937f05eb-8185-4517-a609-3e64d05191c2',web_group,["or",["=",["trusted","extensions","pp_role"],"ウェブ_サーバ"],["~",["fact","pp_role"],"ウェブ_サーバ"]],"All Nodes")
