@@ -2,7 +2,7 @@
 # from the master's pe_repo by downloading it to C:\tmp first and then running
 # msiexec on it from there.
 
-$puppet_master_server = "master.inf.puppet.vm"
+$puppet_master_server = "master.puppet.vm"
 $msi_source = "https://${puppet_master_server}:8140/packages/current/windows-x86_64/puppet-agent-x64.msi"
 $msi_dest = "C:\tmp\puppet-agent-x64.msi"
 
@@ -24,6 +24,6 @@ Function Get-WebPage { Param( $url, $file, [switch]$force)
 
 Get-WebPage -url $msi_source -file $msi_dest -force
 $msiexec_path = "C:\Windows\System32\msiexec.exe"
-$msiexec_args = " /log c:\log.txt /i $msi_dest PUPPET_MASTER_SERVER=$puppet_master_server PUPPET_AGENT_CERTNAME=$certname"
+$msiexec_args = "/qn /log c:\log.txt /i $msi_dest PUPPET_MASTER_SERVER=$puppet_master_server PUPPET_AGENT_CERTNAME=$certname"
 $msiexec_proc = [System.Diagnostics.Process]::Start($msiexec_path, $msiexec_args)
 $msiexec_proc.WaitForExit()
