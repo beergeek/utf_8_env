@@ -6,6 +6,12 @@ $puppet_master_server = "master.puppet.vm"
 $msi_source = "https://${puppet_master_server}:8140/packages/current/windows-x86_64/puppet-agent-x64.msi"
 $msi_dest = "C:\tmp\puppet-agent-x64.msi"
 
+# St locale to Japan
+Set-WinSystemLocale ja-JP
+
+# CSR Attributes
+New-Item C:\ProgramData\Puppetlabs\Puppet\csr_attributes.yaml -type file -force -value "---`r`nextension_requests:`r`n  pp_role: ウェブ_サーバ"
+
 # Start the agent installation process and wait for it to end before continuing.
 Write-Host "Installing puppet agent from $msi_source"
 

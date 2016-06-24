@@ -65,5 +65,5 @@ roles:
       - type: shell
         inline: 'Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "0"'
       - type: reload
-      #- type: shell
-      #  path: "scripts/install_agent.ps1"
+      - type: shell
+        path: "scripts/install_agent.ps1"
