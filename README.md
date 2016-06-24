@@ -12,6 +12,7 @@ The following is a list of the current machines:
 * node0.puppet.vm (CentOS 6)
 * node1.puppet.vm (CentOS 7)
 * node2.puppet.vm (Ubuntu 16.04)
+* node3.puppet.vm (Debian 8)
 * win0.puppet.vm (Windows 2008r2)
 * win1.puppet.vm (Windows 2012r2)
 
@@ -31,4 +32,8 @@ vagrant up
 
 This will bring up the master, plus a CentOS6 and CentOS7 node.
 
-The remaining nodes can be brought up separately as required.
+The remaining nodes can be brought up separately as required, e.g.
+
+```shell
+vagrant up node3.puppet.vm
+```

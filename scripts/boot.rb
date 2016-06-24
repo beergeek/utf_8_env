@@ -125,6 +125,7 @@ def change_classification()
     'pe_repo::platform::el_7_x86_64' => {},
     'pe_repo::platform::el_6_x86_64' => {},
     'pe_repo::platform::ubuntu_1604_amd64' => {},
+    'pe_repo::platform::debian_8_amd64' => {},
     'pe_repo::platform::windows_x86_64' => {},
     'puppet_enterprise::profile::master' => {},
     'puppet_enterprise::profile::master::mcollective' => {},

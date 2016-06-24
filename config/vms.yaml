@@ -20,6 +20,11 @@ vms:
     roles: [ "posix_agent" ]
     autostart: false
 
+  - name: "node3.puppet.vm"
+    box: "puppetlabs/debian-8.2-64-nocm"
+    roles: [ "posix_agent" ]
+    autostart: false
+
   - name: "win0.puppet.vm"
     box: "windows-server-2008-r2-x64-v2"
     roles: [ "windows_agent" ]
