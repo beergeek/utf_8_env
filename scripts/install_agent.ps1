@@ -6,7 +6,7 @@ $puppet_master_server = "master.puppet.vm"
 $msi_source = "https://${puppet_master_server}:8140/packages/current/windows-x86_64/puppet-agent-x64.msi"
 $msi_dest = "C:\tmp\puppet-agent-x64.msi"
 
-# St locale to Japan
+# Set locale to Japan
 Set-WinSystemLocale ja-JP
 
 # CSR Attributes
