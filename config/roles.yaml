@@ -61,4 +61,8 @@ roles:
         inline: 'Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value "0"'
       - type: reload
       - type: shell
+        inline: |-
+          New-Item C:\ProgramData\Puppetlabs\Puppet\etc -type directory -force
+          Copy-Item C:\vagrant\web_server.attributes C:\ProgramData\PuppetLabs\Puppet\etc\csr_attribtues.yaml -force
+      - type: shell
         path: "scripts/install_agent.ps1"
