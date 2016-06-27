@@ -7,6 +7,77 @@ require 'facter'
 require 'r10k/action/deploy/environment'
 require 'r10k/action/runner'
 
+private_key = <<-EOS
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEApjhnxCSNWVJJGoRKvrV00cMB8utFSxIlG87Hid2ViTQMgRAj
+bDXWAlj9lMyiwU5XRUrCAjRJuw+oOcYxl6MQap8rgalc42DBmixbmlWFa/CV+qEn
+D/RDY7jm0esAbuyybtkaIn4IIWSfNuiKi18UqCn54189fBWxzH6DgNnoawcqQya0
+IFSoEqf+YZqr+KRJa4EJoDridgRzMaE7CHcT3HThGbYahJM/rLqb569RALHamZCC
+q1zCYeUC+tkgtItvX1MiPuDwfb9DpDyS+Ktm/Jry2fQ6a5K0pWpulmBtlUH/b7IS
+18RqPQ9zk8Y7k6k2ydv+OG3wb/gHVLT8oZR+tQIDAQABAoIBADpda/Ivc4J9pjWt
+ZiF4zcAp3TFS803c3TLadK4wJCW9JPbcl9OTQ8YnQUNSZ4PA4lvuWBk2Cv2oDcXb
+leZM16LYqQoqUfd1LgXYtYGHrgWswLz0gSbU+iS19DaZcdmBO1Y43ThnUKuJDW7W
+UG+Hv1UdCCWSd6BubbQEaGCCI14Q4OeenmGbIzwBzjnlH2Xmteur0wYjmGT5nxoJ
+42qD7Rm2OPsy6y5NDTJejMJDXASVBj1wQtmNTlnhGfzn4etNslav+srFhvwsqxFc
+v43HGKb9VIzCW8IMVn51wXPb4b5sV6UBy7XdEyWrjjTrOpA5dXi2dQtRMP9qBiqJ
+jks7vrECgYEA2m+1z3dCFkZgBiLyBIob+cF0GfBMxeKyYfiK5Y8/z6qTdFCAjVtD
+q2q9GG0gBUJtvAb7AMlwsj+ozwTY7Dn9zFpjWn1PuIEerG7D4wtFMn9km/TD5YAc
+51woUqMZIkLCqp/OkrrhRu+XjC0+DhWU48V4VIk1XRPCy78h+My9Q7cCgYEAws35
+FLdiWJUXZaAeKQW3CV/lhm0nODPksGXi4J2q4Ljw7MrbU5EULd+Ek4ietiPM1P04
+Ggwa4GVYU9gTtVsCEjeBc7ZZntk12N247tH1azL3d9huC6BNFGh+URBG1NdvjkoF
+ZnxIie4fWmyF9WLNMmAlY81SVjZlI9w9s7msiPMCgYAl05SDcd6C5vr39RM+EACa
+NpL5bvCMkB5d8uFysWTWfG5+hPZOBFDqnVhTo4oY/xDrr7XFxBx88aM0/lzmQ4Cc
+48YyxGKKy+lY6PGJHsmD3iW5ECDgXFglBIODE/VlRnRZgcUPCce7NgBjaO5HGBup
+eefFk+Em1iY0jEvAvwvDbwKBgBTd00xwyEwMzFDKcfCa+Bw89W0MzCKtDFYI0+CT
+gvZHWSdEI3I0HCE9zAmxnK6N7ybxaM0Bdu+Ka4evoYzPjs08vNUUN01Ynvf36BNM
+0ikFcJSZzk/Yf+kruDwerjemTADF1QZBUdPUee9JqJ+8UZaPzfF+0M8DTJomwUU7
+IkwZAoGBAJhZYyuXhdJu4hO7KgvUAH29FibTmRceVHWqjH1TYVCDrmWvRQcRp0Mq
+C4pqyV/fLR0ijCluO9/bDFWf1NKf3OFqFPpu84D0yVgKxINyVP32GWx6yP2keHsz
+YUl+N0ChGemstrmAyRglzZUINLTLfjKRcZzFIoSEuaSRoqSSJB2R
+-----END RSA PRIVATE KEY-----
+EOS
+
+public_key = <<-EOS
+-----BEGIN CERTIFICATE-----
+MIIC2TCCAcGgAwIBAgIBATANBgkqhkiG9w0BAQUFADAAMCAXDTE2MDYyNjIzNTEz
+NloYDzIwNjYwNjE0MjM1MTM2WjAAMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEApjhnxCSNWVJJGoRKvrV00cMB8utFSxIlG87Hid2ViTQMgRAjbDXWAlj9
+lMyiwU5XRUrCAjRJuw+oOcYxl6MQap8rgalc42DBmixbmlWFa/CV+qEnD/RDY7jm
+0esAbuyybtkaIn4IIWSfNuiKi18UqCn54189fBWxzH6DgNnoawcqQya0IFSoEqf+
+YZqr+KRJa4EJoDridgRzMaE7CHcT3HThGbYahJM/rLqb569RALHamZCCq1zCYeUC
++tkgtItvX1MiPuDwfb9DpDyS+Ktm/Jry2fQ6a5K0pWpulmBtlUH/b7IS18RqPQ9z
+k8Y7k6k2ydv+OG3wb/gHVLT8oZR+tQIDAQABo1wwWjAPBgNVHRMBAf8EBTADAQH/
+MB0GA1UdDgQWBBTt2IMiH/4qn1Pz2PHPaB7o+VJdLTAoBgNVHSMEITAfgBTt2IMi
+H/4qn1Pz2PHPaB7o+VJdLaEEpAIwAIIBATANBgkqhkiG9w0BAQUFAAOCAQEATtHc
+Twa0D+v8nb+eta3cs+BdGsW7uZvOcwlVbD0JWtE45EaGHs448y+99e+5UeQi+Kp1
+rRtVD+So2606BY29fyndE+BOgFndGZRznWeiBBUZ1mO/WRyJZEyLEHA9CBJLdZZ3
+USQ+QkGQP2Zs1Lmx1sHOL2puiLZlNWhq5o8NJ5/13g7gwte4hYeXvrzID1I3cUrb
+dwMPt6oidmx47ZSTNkocl00+1SSdt74yB+FFbvSoaiE5L4fzoFsYd7LYKmen9TsH
+CVm0Fnw2jKopBx8QgdMRlaz6gAuIFaWMCSXLh2tzokJxzcIreKjkKbe6pSbLDLGk
+niYGTE2SC9pmrPAurw==
+-----END CERTIFICATE-----
+EOS
+
+hiera_config = <<-EOS
+---
+:backends:
+  - yaml
+  - json
+  - eyaml
+:hierarchy:
+  - "%{::trusted.certname}"
+  - common
+
+:yaml:
+  :datadir: /etc/puppetlabs/code/environments/%{environment}/hieradata
+:json:
+  :datadir: /etc/puppetlabs/code/environments/%{environment}/hieradata
+:eyaml:
+  :datadir: /etc/puppetlabs/code/environments/%{environment}/hieradata
+  :pkcs7_private_key: /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem
+  :pkcs7_public_key: /etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem
+EOS
+
 def cputs(string)
   puts "\033[1m#{string}\033[0m"
 end
@@ -155,6 +226,21 @@ def update_node_group(node_group,rule,classes)
   groups.update_group(group_hash)
 end
 
-config_r10k('https://github.com/beergeek/japan_test.git')
+def resource_manage(resource_type, resource_name, cmd_hash)
+  begin
+    cputs "Managing reosurce #{resource_name}"
+    x = ::Puppet::Resource.new(resource_type, resource_name, :parameters => cmd_hash)
+    result, report = ::Puppet::Resource.indirection.save(x)
+    report.finalize_report
+    if report.exit_status == 4
+      raise "ERROR: Could not manage resource of #{resource_type} with the title #{resource_name}: #{report.exit_status}"
+    end
+  end
+end
+
+config_r10k('https://github.com/beergeek/utf_8_test.git')
 new_groups()
 change_classification()
+resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0400','content' => "#{private_key}" })
+resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0644','content' => "#{public_key}" })
+resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','owner' => 'root','group' => 'root', 'mode' => '0644','content' => "#{hiera_config}" })

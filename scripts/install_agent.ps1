@@ -10,7 +10,8 @@ $msi_dest = "C:\tmp\puppet-agent-x64.msi"
 Set-WinSystemLocale ja-JP
 
 # CSR Attributes
-New-Item C:\ProgramData\Puppetlabs\Puppet\csr_attributes.yaml -type file -force -value "---`r`nextension_requests:`r`n  pp_role: ウェブ_サーバ"
+New-Item C:\ProgramData\Puppetlabs\Puppet -type directory -force
+[IO.File]::WriteAllLines('c:\temp\rune.txt',"---`r`nextension_requests:`r`n  pp_role: ウェブ_サーバ")
 
 # Start the agent installation process and wait for it to end before continuing.
 Write-Host "Installing puppet agent from $msi_source"

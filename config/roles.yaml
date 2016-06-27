@@ -26,15 +26,10 @@ roles:
         autosign: true
       - type: shell
         inline: |-
-          "cp /vagrant/hiera.yaml /etc/puppetlabs/puppet/hiera.yaml"
-          "/opt/puppetlabs/puppet/bin/gem install puppetclassify hiera-eyaml --no-ri --no-rdoc"
-          "/opt/puppetlabs/bin/puppetserver gem install hiera-eyaml --no-ri --no-rdoc"
-          "cp /vagrant/b /etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem"
-          "echo '-----BEGIN RSA PRIVATE KEY-----' > /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
-          "cat /vagrant/a >> /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
-          "echo '-----END RSA PRIVATE KEY-----' >> /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
-          "chown pe-puppet:pe-puppet /etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem"
-          "systemctl restart pe-puppetserver"
+          /opt/puppetlabs/puppet/bin/gem install puppetclassify hiera-eyaml --no-ri --no-rdoc
+          /opt/puppetlabs/bin/puppetserver gem install hiera-eyaml --no-ri --no-rdoc
+      - type: shell
+        inline: "systemctl restart pe-puppetserver"
       - type: shell
         inline: "/opt/puppetlabs/puppet/bin/ruby /vagrant/scripts/boot.rb"
       - type: shell
