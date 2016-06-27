@@ -63,6 +63,6 @@ roles:
       - type: shell
         inline: |-
           New-Item C:\ProgramData\Puppetlabs\Puppet\etc -type directory -force
-          Copy-Item C:\vagrant\web_server.attributes C:\ProgramData\PuppetLabs\Puppet\etc\csr_attribtues.yaml -force
+          Copy-Item C:\vagrant\web_server.attributes C:\ProgramData\PuppetLabs\Puppet\etc\csr_attributes.yaml -force
       - type: shell
         path: "scripts/install_agent.ps1"
