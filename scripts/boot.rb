@@ -164,12 +164,12 @@ def new_groups()
   cputs = "Making New Node Groups"
   web_group = {
     'role::base' => {
-      'ensure_japanase_files' => false,
-      'ensure_japanese_group' => false,
-      'ensure_japanese_host' => false,
-      'ensure_japanese_users' => false,
-      'ensure_japanse_concat' => false,
-      'japanese_notify_string' => 'こんにちは',
+      'ensure_utf_8_files' => false,
+      'ensure_utf_8_group' => false,
+      'ensure_utf_8_host' => false,
+      'ensure_utf_8_users' => false,
+      'ensure_utf_8_concat' => false,
+      'utf_8_notify_string' => 'こんにちは',
     }
   }
 
