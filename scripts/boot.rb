@@ -238,7 +238,7 @@ def resource_manage(resource_type, resource_name, cmd_hash)
   end
 end
 
-config_r10k('https://github.com/beergeek/utf_8_test.git')
+#config_r10k('https://github.com/beergeek/utf_8_test.git')
 new_groups()
 change_classification()
 resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0400','content' => "#{private_key}" })
