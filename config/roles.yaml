@@ -28,6 +28,7 @@ roles:
         inline: |-
           /opt/puppetlabs/puppet/bin/gem install puppetclassify hiera-eyaml --no-ri --no-rdoc
           /opt/puppetlabs/bin/puppetserver gem install hiera-eyaml --no-ri --no-rdoc
+          /vagrant/scripts/deploy.sh
       - type: shell
         inline: "systemctl restart pe-puppetserver"
       - type: shell
