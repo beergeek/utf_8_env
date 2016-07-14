@@ -124,12 +124,13 @@ def load_config
   master = Puppet.settings[:server]
   @master = master
   if master
-    @classifier_url = "https://#{master}:4433/classifier-api"
-    @rbac_url       = "https://#{master}:4433/rbac-api"
-    @puppet_ca_url  = "https://#{master}:8140/puppet-ca"
-    @puppetdb_url   = "https://#{master}:8081/pdb"
-    @puppet_url     = "https://#{master}:8140/puppet"
-    @status_url     = "https://#{master}:8140/status"
+    @classifier_url   = "https://#{master}:4433/classifier-api"
+    @rbac_url         = "https://#{master}:4433/rbac-api"
+    @puppet_ca_url    = "https://#{master}:8140/puppet-ca"
+    @puppetdb_url     = "https://#{master}:8081/pdb"
+    @puppet_url       = "https://#{master}:8140/puppet"
+    @status_url       = "https://#{master}:8140/status"
+    @orchestrator_url = "https://#{master}:8143/orchestrator"
     auth_info = {
       'ca_certificate_path' => Puppet[:localcacert],
       'certificate_path'    => Puppet[:hostcert],
@@ -216,7 +217,11 @@ end
 
 def test(description,expected_result = true)
   puts "Running: #{description}"
-  val = yield if block_given?
+  begin
+    val = yield if block_given?
+  rescue => e
+    puts e.to_s
+  end
   if val == expected_result
     puts "  Passed."
   else
@@ -340,10 +345,46 @@ test 'PuppetDB should return events that contains UTF8 data' do
   result.count > 0
 end
 
-test 'PuppetDB should return aggregate even counts that contain UTF8 data' do
+test 'PuppetDB should return aggregate event counts that contain UTF8 data' do
   result = JSON.parse(@api_setup.get_with_token(URI.escape("#{@puppetdb_url}/query/v4/aggregate-event-counts?summarize_by=resource&query=[\"=\",\"new_value\",\"こんにちは\"]")).body)
   result[0]['total'] > 0
 end
 
-# require 'pry'
-# binding.pry
+test 'Orchestrator should be able to list applications' do
+  result = JSON.parse(@api_setup.get_with_token(URI.escape("#{@orchestrator_url}/v1/environments/production/instances")).body)
+  result['items'].all? do |app|
+    app['title'] == 'English' or app['title'] == 'ブランク'
+  end
+end
+
+test 'Orchestrator should be able to run applications' do
+  # Get all applications
+  applications = JSON.parse(@api_setup.get_with_token(URI.escape("#{@orchestrator_url}/v1/environments/production/instances")).body)['items']
+  results = []
+
+  # Deploy each application
+  applications.each do |application|
+    deploy = JSON.parse(@api_setup.post_with_token(URI.escape("#{@orchestrator_url}/v1/command/deploy"),{
+      'environment' => 'production',
+      'target' => "#{application['type']}[#{application['title']}]",
+    }.to_json).body)
+    deploy_status = JSON.parse(@api_setup.get_with_token(deploy['job']['id']).body)
+    sleep 1
+    require 'pry'
+    require 'pry-byebug'
+    # Periodically check the status until it is done
+    until deploy_status['status'].last['state'] == 'failed' or deploy_status['status'].last['state'] == 'finished' do
+      sleep 1
+      deploy_status = JSON.parse(@api_setup.get_with_token(deploy['job']['id']).body)
+    end
+
+    # Now get the reports
+    reports = JSON.parse(@api_setup.get_with_token(deploy_status['report']['id']).body)['report']
+    results << reports.any? do |report|
+      report['events'].any? do |event|
+        event['new_value'] == 'ブランク'
+      end
+    end
+    results.all? # Check that they were all true
+  end
+end
