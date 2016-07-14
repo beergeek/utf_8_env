@@ -131,6 +131,7 @@ def load_config
     @puppet_url       = "https://#{master}:8140/puppet"
     @status_url       = "https://#{master}:8140/status"
     @orchestrator_url = "https://#{master}:8143/orchestrator"
+    @activity_url     = "https://#{master}:4433/activity-api"
     auth_info = {
       'ca_certificate_path' => Puppet[:localcacert],
       'certificate_path'    => Puppet[:hostcert],
@@ -370,8 +371,6 @@ test 'Orchestrator should be able to run applications THIS WILL FAIL DUE TO PCP-
     }.to_json).body)
     deploy_status = JSON.parse(@api_setup.get_with_token(deploy['job']['id']).body)
     sleep 1
-    require 'pry'
-    require 'pry-byebug'
     # Periodically check the status until it is done
     until deploy_status['status'].last['state'] == 'failed' or deploy_status['status'].last['state'] == 'finished' do
       sleep 1
@@ -387,4 +386,21 @@ test 'Orchestrator should be able to run applications THIS WILL FAIL DUE TO PCP-
     end
   end
   results.all? # Check that they were all true
+end
+
+test 'The RBAC Events API should respond with UTF8 Characters correctly in names' do
+  response = JSON.parse(@api_setup.get_with_token(URI.escape("#{@activity_url}/v1/events?service_id=classifier")).body)
+  response['commits'].any? do |commit|
+    commit['object']['name'] == 'ウェブ・グループ'
+  end
+end
+
+
+test 'The RBAC Events API should respond with UTF8 Characters correctly in events' do
+  response = JSON.parse(@api_setup.get_with_token(URI.escape("#{@activity_url}/v1/events?service_id=classifier")).body)
+  response['commits'].any? do |commit|
+    commit['events'].any? do |event|
+      event['message'] =~ /ウェブ_サーバ/
+    end
+  end
 end
