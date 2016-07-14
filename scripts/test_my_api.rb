@@ -357,7 +357,7 @@ test 'Orchestrator should be able to list applications' do
   end
 end
 
-test 'Orchestrator should be able to run applications' do
+test 'Orchestrator should be able to run applications THIS WILL FAIL DUE TO PCP-494, it should pass when fixed.' do
   # Get all applications
   applications = JSON.parse(@api_setup.get_with_token(URI.escape("#{@orchestrator_url}/v1/environments/production/instances")).body)['items']
   results = []
@@ -382,9 +382,9 @@ test 'Orchestrator should be able to run applications' do
     reports = JSON.parse(@api_setup.get_with_token(deploy_status['report']['id']).body)['report']
     results << reports.any? do |report|
       report['events'].any? do |event|
-        event['new_value'] == 'ブランク'
+        event['new_value'] == 'ブランク' or event['new_value'] == 'English'
       end
     end
-    results.all? # Check that they were all true
   end
+  results.all? # Check that they were all true
 end
