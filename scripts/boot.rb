@@ -134,6 +134,8 @@ def new_user(user)
   output = @api_setup.post("#{@rbac_url}/v1/users", user.to_json)
   if output.code.to_i <= 400
     reset_user_password(output['location'].split('/').last, user['login'])
+  elsif output.code.to_i == 409
+    #retrieve the ID for the user here and reset password as per normal
   else
     raise Puppet::Error, "Failed to create new user: #{output.code} #{output.body}"
   end
