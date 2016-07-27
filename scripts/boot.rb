@@ -129,11 +129,11 @@ def load_rbac_config
   end
 end
 
-def new_user(user)
+def new_user(user, token_dir)
   load_rbac_config
   output = @api_setup.post("#{@rbac_url}/v1/users", user.to_json)
   if output.code.to_i <= 400
-    reset_user_password(output['location'].split('/').last, user['login'])
+    reset_user_password(output['location'].split('/').last, user['login'], token_dir)
   elsif output.code.to_i == 409
     #retrieve the ID for the user here and reset password as per normal
   else
@@ -141,13 +141,13 @@ def new_user(user)
   end
 end
 
-def reset_user_password(user_id, user_login)
+def reset_user_password(user_id, user_login, token_dir)
   load_rbac_config
   reset_token = @api_setup.post("#{@rbac_url}/v1/users/#{user_id}/password/reset")
   if reset_token.code.to_i <= 400
     password_reset = @api_setup.post("#{@rbac_url}/v1/auth/reset", { 'token' => reset_token.body, 'password' => 'モンスタートラック'}.to_json)
     if password_reset.code.to_i <= 400
-      token = new_token({'login' => user_login, 'password' => 'モンスタートラック', 'lifetime' => '99d'})
+      token = new_token({'login' => user_login, 'password' => 'モンスタートラック', 'lifetime' => '99d'}, token_dir)
     else
       raise Puppet::Error, "Failed to reset password: #{password_reset.code} #{password_reset.body}"
     end
@@ -156,11 +156,16 @@ def reset_user_password(user_id, user_login)
   end
 end
 
-def new_token(login)
+def new_token(login, token_dir = nil)
   load_rbac_config
   output = @api_setup.post("#{@rbac_url}/v1/auth/token", login.to_json)
   if output.code.to_i <= 400
-    puts output.body
+    if token_dir
+      Dir.mkdir(token_dir)
+      f = open("#{token_dir}/token", 'w')
+      f.write(JSON.parse(output.body)['token'])
+      f.close
+    end
   else
     raise Puppet::Error, "Failed to create new user: #{output.code} #{output.body}"
   end
@@ -299,4 +304,4 @@ change_classification()
 resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0400','content' => "#{private_key}" })
 resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0644','content' => "#{public_key}" })
 resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','owner' => 'root','group' => 'root', 'mode' => '0644','content' => "#{hiera_config}" })
-new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]})
+new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
