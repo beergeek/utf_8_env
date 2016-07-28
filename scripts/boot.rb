@@ -145,6 +145,7 @@ def reset_user_password(user_id, user_login, token_dir)
   load_rbac_config
   reset_token = @api_setup.post("#{@rbac_url}/v1/users/#{user_id}/password/reset")
   if reset_token.code.to_i <= 400
+    # yes I know this is not good programming practise, but this is me giving a shit right now.......
     password_reset = @api_setup.post("#{@rbac_url}/v1/auth/reset", { 'token' => reset_token.body, 'password' => 'モンスタートラック'}.to_json)
     if password_reset.code.to_i <= 400
       token = new_token({'login' => user_login, 'password' => 'モンスタートラック', 'lifetime' => '99d'}, token_dir)
@@ -158,6 +159,7 @@ end
 
 def new_token(login, token_dir = nil)
   load_rbac_config
+  # https://tickets.puppetlabs.com/browse/PE-13331 issue
   output = @api_setup.post("#{@rbac_url}/v1/auth/token", login.to_json)
   if output.code.to_i <= 400
     if token_dir
@@ -224,10 +226,10 @@ def new_groups()
   cputs = "Making New Node Groups"
   web_group = {
     'role::base' => {
-      'ensure_utf_8_files' => false,
-      'ensure_utf_8_group' => false,
-      'ensure_utf_8_host' => false,
-      'ensure_utf_8_users' => false,
+      'ensure_utf_8_files'  => false,
+      'ensure_utf_8_group'  => false,
+      'ensure_utf_8_host'   => false,
+      'ensure_utf_8_users'  => false,
       'ensure_utf_8_concat' => false,
       'utf_8_notify_string' => 'こんにちは',
     }
