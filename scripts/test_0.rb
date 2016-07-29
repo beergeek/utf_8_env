@@ -1,8 +1,6 @@
 #!/opt/puppetlabs/puppet/bin/ruby
 
 require 'puppet'
-require 'pry'
-require 'pry-byebug'
 require 'puppetclassify'
 
 # Have puppet parse its config so we can call its settings
