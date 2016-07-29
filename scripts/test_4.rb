@@ -88,4 +88,4 @@ end
 
 get_data(@real_nodes + @not_so_real_nodes, 'User', @user_resources)
 get_data(@real_nodes + @not_so_real_nodes, 'Group', @group_resources)
-get_data(@not_so_real_nodes, 'Registry::Value', @registry_resources)
+get_data(@not_so_real_nodes, 'Registry_value', @registry_resources)
