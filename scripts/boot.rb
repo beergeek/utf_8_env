@@ -4,10 +4,8 @@ require 'getoptlong'
 require 'puppet'
 require 'hiera'
 require 'facter'
-require 'r10k/action/deploy/environment'
-require 'r10k/action/runner'
 
-private_key = <<-EOS
+@private_key = <<-EOS
 -----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEApjhnxCSNWVJJGoRKvrV00cMB8utFSxIlG87Hid2ViTQMgRAj
 bDXWAlj9lMyiwU5XRUrCAjRJuw+oOcYxl6MQap8rgalc42DBmixbmlWFa/CV+qEn
@@ -37,7 +35,7 @@ YUl+N0ChGemstrmAyRglzZUINLTLfjKRcZzFIoSEuaSRoqSSJB2R
 -----END RSA PRIVATE KEY-----
 EOS
 
-public_key = <<-EOS
+@public_key = <<-EOS
 -----BEGIN CERTIFICATE-----
 MIIC2TCCAcGgAwIBAgIBATANBgkqhkiG9w0BAQUFADAAMCAXDTE2MDYyNjIzNTEz
 NloYDzIwNjYwNjE0MjM1MTM2WjAAMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
@@ -58,7 +56,7 @@ niYGTE2SC9pmrPAurw==
 -----END CERTIFICATE-----
 EOS
 
-hiera_config = <<-EOS
+@hiera_config = <<-EOS
 ---
 :backends:
   - yaml
@@ -111,15 +109,18 @@ def config_r10k(remote)
   @classifier.update_classes.update
 end
 
-def load_rbac_config
+def load_api_config
   master = Puppet.settings[:server]
   @master = master
   if master
     @rbac_url = "https://#{master}:4433/rbac-api"
+    @cm_url   = "https://#{master}:8170/code-manager"
+    @fs_url   = "https://#{master}:8140/file-sync"
     auth_info = {
       'ca_certificate_path' => Puppet[:localcacert],
       'certificate_path'    => Puppet[:hostcert],
       'private_key_path'    => Puppet[:hostprivkey],
+      'read_timeout'        => 600
     }
     unless @api_setup
       @api_setup = PuppetHttps.new(auth_info)
@@ -130,7 +131,7 @@ def load_rbac_config
 end
 
 def new_user(user, token_dir)
-  load_rbac_config
+  load_api_config
   output = @api_setup.post("#{@rbac_url}/v1/users", user.to_json)
   if output.code.to_i <= 400
     reset_user_password(output['location'].split('/').last, user['login'], token_dir)
@@ -142,7 +143,7 @@ def new_user(user, token_dir)
 end
 
 def reset_user_password(user_id, user_login, token_dir)
-  load_rbac_config
+  load_api_config
   reset_token = @api_setup.post("#{@rbac_url}/v1/users/#{user_id}/password/reset")
   if reset_token.code.to_i <= 400
     # yes I know this is not good programming practise, but this is me giving a shit right now.......
@@ -158,7 +159,7 @@ def reset_user_password(user_id, user_login, token_dir)
 end
 
 def new_token(login, token_dir = nil)
-  load_rbac_config
+  load_api_config
   # https://tickets.puppetlabs.com/browse/PE-13331 issue
   output = @api_setup.post("#{@rbac_url}/v1/auth/token", login.to_json)
   if output.code.to_i <= 400
@@ -300,10 +301,33 @@ def resource_manage(resource_type, resource_name, cmd_hash)
   end
 end
 
+def deploy_code
+  cputs "Deploying code"
+  load_api_config
+  response = JSON.parse(@api_setup.post_with_token("#{@cm_url}/v1/deploys",{"deploy-all" => true, "wait" => true}.to_json).body)
+  response.each do |x|
+    if x['status'] != 'complete'
+      raise Puppet::Error, "Code deployment failed, #{response.code} #{response.body}"
+    end
+  end
+end
+
+def commit_code
+  cputs "Commiting code"
+  load_api_config
+  response = JSON.parse(@api_setup.post_with_token("#{@fs_url}/v1/commit",{"commit-all" => true}.to_json).body)
+  if response['puppet-code']['status'] != 'ok'
+    raise Puppet::Error, "Code deployment failed, #{response['puppet-code']['status']}"
+  end
+end
+
 #config_r10k('https://github.com/beergeek/utf_8_test.git')
+resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0400','content' => "#{@private_key}" })
+resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0644','content' => "#{@public_key}" })
+resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','owner' => 'root','group' => 'root', 'mode' => '0644','content' => "#{@hiera_config}" })
+new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
+deploy_code
+commit_code
+sleep(60)
 new_groups()
 change_classification()
-resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0400','content' => "#{private_key}" })
-resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0644','content' => "#{public_key}" })
-resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','owner' => 'root','group' => 'root', 'mode' => '0644','content' => "#{hiera_config}" })
-new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
