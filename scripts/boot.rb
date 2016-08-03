@@ -83,30 +83,32 @@ end
 # Have puppet parse its config so we can call its settings
 Puppet.initialize_settings
 
-def config_r10k(remote)
-  cputs "Configuring r10k"
-  load_classifier
-  conf = Puppet::Resource.new("file",'/etc/puppetlabs/r10k/r10k.yaml', :parameters => {
-    :ensure => 'file',
-    :owner  => 'root',
-    :group  => 'root',
-    :mode   => '0644',
-    :content => "cachedir: '/var/cache/r10k'\n\nsources:\n  code:\n    remote: '#{remote}'\n    basedir: '/etc/puppetlabs/code/environments'"
-  })
-  result, report = Puppet::Resource.indirection.save(conf)
-  puts report.logs
+# Monkey patch some token support in
+class PuppetHttps
+  def get_with_token(url)
+    url = URI.parse(url)
+    accept = 'application/json'
+    token = File.read('/root/.puppetlabs/token')
 
-  options = {
-    :puppetfile => true,
-    :config     => '/etc/puppetlabs/r10k/r10k.yaml',
-    :loglevel   => 'info'
-  }
-  my_action = R10K::Action::Deploy::Environment
+    req = Net::HTTP::Get.new("#{url.path}?#{url.query}", {"Accept" => accept, "X-Authentication" => token})
+    res = make_ssl_request(url, req)
+    res
+  end
 
-  runner = R10K::Action::Runner.new(options, [], my_action)
-  runner.call
-  cputs "Finished r10k"
-  @classifier.update_classes.update
+  def post_with_token(url, request_body=nil)
+    url = URI.parse(url)
+    token = File.read('/root/.puppetlabs/token')
+
+    request = Net::HTTP::Post.new(url.request_uri, {"X-Authentication" => token})
+    request.content_type = 'application/json'
+
+    unless request_body.nil?
+      request.body = request_body
+    end
+
+    res = make_ssl_request(url, request)
+    res
+  end
 end
 
 def load_api_config
@@ -206,8 +208,8 @@ end
 # from there that the default install lays down
 def create_group(group_name,group_uuid,classes = {},rule_term,parent_group)
   load_classifier
-  groups = @classifier.groups
   @classifier.update_classes.update
+  groups = @classifier.groups
   current_group = groups.get_groups.select { |group| group['name'] == group_name}
   if current_group.empty?
     cputs "Creating #{group_name} group in classifier"
@@ -225,6 +227,7 @@ end
 
 def new_groups()
   cputs = "Making New Node Groups"
+  test_class('role::base')
   web_group = {
     'role::base' => {
       'ensure_utf_8_files'  => false,
@@ -277,6 +280,7 @@ end
 def update_node_group(node_group,rule,classes)
   cputs "Update Node Group #{node_group}"
   load_classifier
+  @classifier.update_classes.update
   groups = @classifier.groups
   pe_group = groups.get_groups.select { |group| group['name'] == "#{node_group}"}
 
@@ -321,6 +325,22 @@ def commit_code
   end
 end
 
+def test_class(class_name)
+  load_classifier
+  class_found = false
+  if class_found == false
+    @classifier.update_classes.update
+    response = JSON.parse(@api_setup.get_with_token(URI.escape("#{@classifier_url}/v1/environments/production/classes/#{class_name}")).body)
+    if response['name'] == class_name
+      class_found = true
+      cputs "Found #{class_name} in NC registry"
+    else
+      cputs "#{class_name} not in NC registry as yet"
+      sleep(30)
+    end
+  end
+end
+
 #config_r10k('https://github.com/beergeek/utf_8_test.git')
 resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0400','content' => "#{@private_key}" })
 resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0644','content' => "#{@public_key}" })
@@ -328,6 +348,6 @@ resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','
 new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
 deploy_code
 commit_code
-sleep(60)
+test_class('utf_8')
 new_groups()
 change_classification()
