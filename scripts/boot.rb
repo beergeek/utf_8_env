@@ -295,7 +295,7 @@ end
 
 def resource_manage(resource_type, resource_name, cmd_hash)
   begin
-    cputs "Managing reosurce #{resource_name}"
+    cputs "Managing resource #{resource_name}"
     x = ::Puppet::Resource.new(resource_type, resource_name, :parameters => cmd_hash)
     result, report = ::Puppet::Resource.indirection.save(x)
     report.finalize_report
@@ -328,7 +328,7 @@ end
 def test_class(class_name)
   load_classifier
   class_found = false
-  if class_found == false
+  while class_found == false do
     @classifier.update_classes.update
     response = JSON.parse(@api_setup.get_with_token(URI.escape("#{@classifier_url}/v1/environments/production/classes/#{class_name}")).body)
     if response['name'] == class_name
