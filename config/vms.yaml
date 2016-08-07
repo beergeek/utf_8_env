@@ -1,7 +1,7 @@
 ---
 vms:
   - name: "master.puppet.vm"
-    box:  "puppetlabs/centos-7.0-64-nocm"
+    box:  "puppetlabs/ubuntu-16.04-64-nocm"
     roles: [ "primary" ]
     autostart: true
 
