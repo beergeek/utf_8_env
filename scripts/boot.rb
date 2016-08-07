@@ -1,9 +1,6 @@
 #!/opt/puppetlabs/puppet/bin/ruby
 require 'puppetclassify'
-require 'getoptlong'
 require 'puppet'
-require 'hiera'
-require 'facter'
 
 @private_key = <<-EOS
 -----BEGIN RSA PRIVATE KEY-----
@@ -249,12 +246,17 @@ def new_groups()
   db_group = {
     'role::base' => {}
   }
+
+  controller_group = {
+    'puppet_enterprise::profile::controller' => {}
+  }
   #Web Group
   create_group("ウェブ・グループ",'937f05eb-8185-4517-a609-3e64d05191c2',web_group,["or",["=",["trusted","extensions","pp_role"],"ウェブ_サーバ"],["~",["fact","pp_role"],"ウェブ_サーバ"]],"All Nodes")
   #Application Group
   create_group("アプリケーション・グループ",'937f05eb-8185-4517-a609-3e64d05191c1',app_group,["or",["=",["trusted","extensions","pp_role"],"アプリ_サーバ"],["~",["fact","pp_role"],"アプリ_サーバ"]],'All Nodes')
   #Databse Group
   create_group("データベース・グループ",'937f05eb-8185-4517-a609-3e64d05191ca',db_group,["and",["=",["trusted","extensions","pp_role"],"db_サーバ"],["~",["fact","pp_role"],"db_サーバ"]],'All Nodes')
+  create_group('Controller','937f05eb-8185-4517-a609-3e64d05191c7',controller_group,["or",["~",["fact","clientcert"],"node2"]],'All Nodes')
 end
 
 def change_classification()
@@ -339,6 +341,7 @@ def test_class(class_name)
       cputs "Found #{class_name} in NC registry"
     else
       cputs "#{class_name} not in NC registry as yet"
+      commit_code
       sleep(30)
     end
   end

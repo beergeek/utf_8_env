@@ -238,9 +238,6 @@ auth_info = {
 }
 @classifier_identity = PuppetHttps.new(auth_info)
 
-require 'pry'
-require 'pry-byebug'
-
 # test 'When hitting environment_classes it should return japanese defaults', true do
 #   files = JSON.parse(@classifier_identity.get("#{@puppet_url}/v3/environment_classes?environment=production").body)
 #   files['files'].any? { |file|
