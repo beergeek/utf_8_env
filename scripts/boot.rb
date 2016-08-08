@@ -201,6 +201,21 @@ def load_classifier()
   end
 end
 
+def update_master(mod_group, added_classes)
+  cputs "Updating #{mod_group} Node Group"
+  load_classifier
+  @classifier.update_classes.update
+  test_class('role::mom_server')
+  groups = @classifier.groups
+
+  node_group = groups.get_groups.select { |group| group['name'] == mod_group}
+
+  raise "#{mod_group} group missing!" if node_group.empty?
+
+  group_hash = node_group.first.merge({"classes" => added_classes})
+  groups.update_group(group_hash)
+end
+
 # Add parent group as PE Infrasture so we can steal the params
 # from there that the default install lays down
 def create_group(group_name,group_uuid,classes = {},rule_term,parent_group)
@@ -352,8 +367,10 @@ resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensu
 resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0644','content' => "#{@public_key}" })
 resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','owner' => 'root','group' => 'root', 'mode' => '0644','content' => "#{@hiera_config}" })
 new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
+update_master('PE PuppetDB',{ 'puppet_enterprise::profile::puppetdb' => { 'whitelisted_certnames' => ['node1.puppet.vm','node2.puppet.vm'] }})
 deploy_code
 commit_code
+test_class('role::mom_server')
 test_class('utf_8')
 new_groups()
 change_classification()
