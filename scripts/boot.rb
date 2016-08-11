@@ -264,6 +264,10 @@ def new_groups()
   controller_group = {
     'puppet_enterprise::profile::controller' => {}
   }
+
+  repo_group = {
+    'role::repo_server' => {}
+  }
   #Web Group
   create_group("ウェブ・グループ",'937f05eb-8185-4517-a609-3e64d05191c2',web_group,["or",["=",["trusted","extensions","pp_role"],"ウェブ_サーバ"],["~",["fact","pp_role"],"ウェブ_サーバ"]],"All Nodes")
   #Application Group
@@ -271,6 +275,7 @@ def new_groups()
   #Databse Group
   create_group("データベース・グループ",'937f05eb-8185-4517-a609-3e64d05191ca',db_group,["and",["=",["trusted","extensions","pp_role"],"db_サーバ"],["~",["fact","pp_role"],"db_サーバ"]],'All Nodes')
   create_group('Controller','937f05eb-8185-4517-a609-3e64d05191c7',controller_group,["or",["~",["fact","clientcert"],"node2"]],'All Nodes')
+  create_group('Repo Server','937f05eb-8185-4517-a609-3e64d05191d7',repo_group,["or",["~",["fact","clientcert"],"node0"]],'All Nodes')
 end
 
 def change_classification()
