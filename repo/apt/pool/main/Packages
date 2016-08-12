@@ -1,0 +1,17 @@
+Package: ┻━┻-︵ヽ(`Д´)ﾉ︵﻿-┻━┻
+Version: 1.1.1
+Architecture: amd64
+Maintainer: <root@master.puppet.vm>
+Installed-Size: 0
+Filename: dists/stable/main/binary-amd64/┻━┻-︵ヽ(`Д´)ﾉ︵﻿-┻━┻_1.1.1_amd64.deb
+Size: 1544
+MD5sum: ec5dd2c66c32f878dbd946b814d3d1fe
+SHA1: 58b7a22a0fee987a99e75db504df25732a2d46a6
+SHA256: a351f0b9c713ad3c2c74e23479ed3c68827679187d8ec3caa56642c388adcd2a
+Section: default
+Priority: extra
+Homepage: http://example.com/no-uri-given
+Description: no description given
+License: unknown
+Vendor: root@master.puppet.vm
+
