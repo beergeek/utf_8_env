@@ -25,8 +25,10 @@ require 'puppetclassify'
 ]
 
 @user_resources = [
-  '奪います',
-  'ジョー'
+  '奪います_node2',
+  'ジョー_node2',
+  '奪います_node3',
+  'ジョー_node3'
 ]
 
 # Have puppet parse its config so we can call its settings
