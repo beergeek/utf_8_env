@@ -22,15 +22,15 @@ require 'puppet'
 'role::base' => {
   "utf_8_notify_string"   => "こんにちは",
   "ensure_utf_8_concat"   => false,
-  "ensure_utf_8_registry" => true,
+  "ensure_utf_8_registry" => false,
   "ensure_utf_8_exported" => false,
   "ensure_utf_8_virtual"  => false,
   "ensure_utf_8_static"   => false,
-  "ensure_utf_8_group"    => true,
+  "ensure_utf_8_group"    => false,
   "ensure_utf_8_files"    => false,
-  "ensure_utf_8_nrp"      => false,
+  "ensure_utf_8_nrp"      => true,
   "ensure_utf_8_host"     => false,
-  "ensure_utf_8_users"    => true
+  "ensure_utf_8_users"    => false
 }
 }
 
@@ -72,7 +72,6 @@ end
 def update_master(mod_group, added_classes)
   cputs "Updating #{mod_group} Node Group"
   load_classifier
-  @classifier.update_classes.update
   groups = @classifier.groups
 
   node_group = groups.get_groups.select { |group| group['name'] == mod_group}
