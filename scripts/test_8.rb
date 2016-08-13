@@ -25,10 +25,25 @@ require 'puppetclassify'
 ]
 
 @user_resources = [
-  '奪います_node2',
-  'ジョー_node2',
-  '奪います_node3',
-  'ジョー_node3'
+  '奪います',
+  'ジョー',
+]
+
+@file_resources = [
+  '/home/奪います',
+  '/home/奪います/.puppetlabs',
+  '/home/奪います/.puppetlabs/etc',
+  '/home/奪います/.puppetlabs/puppet',
+  '/home/奪います/.puppetlabs/puppet/puppet.conf',
+]
+
+@ini_resources = [
+  'rob_certificate',
+  'joe_certificate',
+  'rob_user',
+  'joe_user',
+  'rob_server',
+  'joe_server'
 ]
 
 # Have puppet parse its config so we can call its settings
@@ -124,4 +139,6 @@ def update_master(mod_group, added_classes)
 end
 
 get_data(@real_nodes, 'User', @user_resources)
+get_data(@real_nodes, 'File', @file_resources)
+get_data(@real_nodes, 'Pe_ini_setting', @ini_resources)
 update_master('ウェブ・グループ',@base_group_default)
