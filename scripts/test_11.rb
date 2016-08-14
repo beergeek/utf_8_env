@@ -46,7 +46,7 @@ require 'puppetclassify'
   'ស្រាបៀរ_node2',
   'ស្រាបៀរ_node3',
   'ស្រាបៀរ_win0',
-  'ស្រាបៀរ_win1',
+  'ស្រាបៀរ_win1'
 ]
 
 # Have puppet parse its config so we can call its settings
