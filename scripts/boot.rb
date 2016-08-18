@@ -374,7 +374,6 @@ resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensur
 resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','owner' => 'root','group' => 'root', 'mode' => '0644','content' => "#{@hiera_config}" })
 new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
 deploy_code
-commit_code
 update_master('PE PuppetDB',{ 'puppet_enterprise::profile::puppetdb' => { 'whitelisted_certnames' => ['node1.puppet.vm','node2.puppet.vm'] }})
 test_class('role::mom_server')
 test_class('utf_8')
