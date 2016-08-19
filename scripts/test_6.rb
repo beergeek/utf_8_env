@@ -2,6 +2,23 @@
 require 'puppetclassify'
 require 'puppet'
 
+@base_group_default = {
+  'role::base' => {
+    "utf_8_notify_string"   => "こんにちは",
+    "ensure_utf_8_concat"   => false,
+    "ensure_utf_8_registry" => false,
+    "ensure_utf_8_exported" => false,
+    "ensure_utf_8_virtual"  => false,
+    "ensure_utf_8_static"   => false,
+    "ensure_utf_8_group"    => false,
+    "ensure_utf_8_files"    => false,
+    "ensure_utf_8_nrp"      => false,
+    "ensure_utf_8_host"     => false,
+    "ensure_utf_8_users"    => false,
+    "ensure_utf_8_lookup"   => false
+  }
+}
+
 def cputs(string)
   puts "\033[1m#{string}\033[0m"
 end
@@ -98,7 +115,26 @@ def reset_user_password(user_id, user_login, token_dir)
   end
 end
 
+def update_master(mod_group, added_classes)
+  cputs "Updating #{mod_group} Node Group"
+  load_config
+  groups = JSON.parse(@api_setup.get_with_token("#{@classifier_url}/v1/groups").body)
+
+  node_group = groups.select { |group| group['name'] == mod_group}
+
+  raise "#{mod_group} group missing!" if node_group.empty?
+
+  group_hash = node_group.first.merge({"classes" => added_classes})
+  update_group = @api_setup.post_with_token("#{@classifier_url}/v1/groups/#{group_hash['id']}",group_hash.to_json)
+  if update_group.code.to_i != 200
+    cputs "Failed to update #{mod_group} #{update_group.code}"
+  else
+    cputs "Success in updating #{mod_group}"
+  end
+end
+
 resource_manage('user','デイビッド',{'ensure' => 'present','home' => '/home/デイビッド'})
 resource_manage('file','/home/デイビッド',{'ensure' => 'directory','owner' => 'デイビッド','group' => 'デイビッド', 'mode' => '0700'})
 resource_manage('file','/home/デイビッド/.puppetlabs',{'ensure' => 'directory','owner' => 'デイビッド','group' => 'デイビッド', 'mode' => '0700'})
 new_user({ 'login' => 'デイビッド','display_name' => 'デイビッド','email' => 'デイビッド@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
+update_master('ウェブ・グループ',@base_group_default)
