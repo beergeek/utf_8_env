@@ -32,7 +32,7 @@ require 'puppet'
   "ensure_utf_8_nrp"      => true,
   "ensure_utf_8_host"     => false,
   "ensure_utf_8_users"    => false,
-  "ensure_utf_8_lookup"   => false
+  "ensure_utf_8_lookup"   => true
 }
 }
 
@@ -82,6 +82,11 @@ def update_master(mod_group, added_classes)
 
   group_hash = node_group.first.merge({"classes" => added_classes})
   groups.update_group(group_hash)
+end
+
+def change_hiera()
+  FileUtils.copy('/vagrant/hiera.yaml','/etc/puppetlabs/puppet/hiera.yaml')
+  system('systemctl restart pe-puppetserver')
 end
 
 update_master('ウェブ・グループ',@base_this_test)

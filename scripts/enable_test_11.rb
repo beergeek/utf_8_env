@@ -14,7 +14,8 @@ require 'puppet'
     "ensure_utf_8_files"    => false,
     "ensure_utf_8_nrp"      => false,
     "ensure_utf_8_host"     => false,
-    "ensure_utf_8_users"    => false
+    "ensure_utf_8_users"    => false,
+    "ensure_utf_8_lookup"   => false
   }
 }
 
@@ -30,7 +31,8 @@ require 'puppet'
   "ensure_utf_8_files"    => false,
   "ensure_utf_8_nrp"      => false,
   "ensure_utf_8_host"     => false,
-  "ensure_utf_8_users"    => false
+  "ensure_utf_8_users"    => false,
+  "ensure_utf_8_lookup"   => true
 }
 }
 
