@@ -1,0 +1,11 @@
+---
+version: 4
+datadir: "/etc/puppetlabs/code/environments/%{environment}/hieradata"
+hierarchy:
+  - name: "%{::trusted.certname}"
+    backend: yaml
+  - name: "%{::clientcert}"
+    backend: json
+  - name: "common"
+    backend: yaml
+    path: "/etc/puppetlabs/code/environments/%{environment}/hieradata/common.yaml"
