@@ -270,6 +270,12 @@ def new_groups()
   repo_group = {
     'role::repo_server' => {}
   }
+
+  agent_group = {
+    'puppet_enterprise::profile::agent' => {
+      "pxp_enabled" => false
+    }
+  }
   #Web Group
   create_group("ウェブ・グループ",'937f05eb-8185-4517-a609-3e64d05191c2',web_group,["or",["=",["trusted","extensions","pp_role"],"ウェブ_サーバ"],["~",["fact","pp_role"],"ウェブ_サーバ"]],"All Nodes")
   #Application Group
@@ -278,6 +284,7 @@ def new_groups()
   create_group("データベース・グループ",'937f05eb-8185-4517-a609-3e64d05191ca',db_group,["and",["=",["trusted","extensions","pp_role"],"db_サーバ"],["~",["fact","pp_role"],"db_サーバ"]],'All Nodes')
   create_group('Controller','937f05eb-8185-4517-a609-3e64d05191c7',controller_group,["or",["~",["fact","clientcert"],"node2"]],'All Nodes')
   create_group('Repo Server','937f05eb-8185-4517-a609-3e64d05191d7',repo_group,["or",["~",["fact","clientcert"],"node0"]],'All Nodes')
+  create_group('PE Agent NRP','937f05eb-8185-4517-a609-3e64d05101d7',agent_group,["and",["~",["fact","clientcert"],"joe|rob"]],'PE Agent')
 end
 
 def change_classification()
@@ -375,6 +382,7 @@ resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','
 new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
 deploy_code
 update_master('PE PuppetDB',{ 'puppet_enterprise::profile::puppetdb' => { 'whitelisted_certnames' => ['node1.puppet.vm','node2.puppet.vm'] }})
+update_master('PE Certificate Authority',{ 'puppet_enterprise::profile::certificate_authority' => { 'client_whitelist' => ['master.puppet.vm'] }})
 test_class('role::mom_server')
 test_class('utf_8')
 new_groups()

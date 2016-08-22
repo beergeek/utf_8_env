@@ -47,6 +47,13 @@ require 'puppetclassify'
   'joe_server'
 ]
 
+@nrp_certs = [
+  'joe_node2',
+  'rob_node2',
+  'joe_node3',
+  'rob_node3'
+]
+
 # Have puppet parse its config so we can call its settings
 Puppet.initialize_settings
 
@@ -94,6 +101,7 @@ def load_config
     @status_url       = "https://#{master}:8140/status"
     @orchestrator_url = "https://#{master}:8143/orchestrator"
     @activity_url     = "https://#{master}:4433/activity-api"
+    @ca_url           = "https://#{master}:8140/puppet-ca"
     auth_info = {
       'ca_certificate_path' => Puppet[:localcacert],
       'certificate_path'    => Puppet[:hostcert],
@@ -139,7 +147,20 @@ def update_master(mod_group, added_classes)
   end
 end
 
+def get_certs(cert_names)
+  load_config
+  cert_names.each do |cert_name|
+    cert = @api_setup.get("#{@ca_url}/v1/certificate/#{cert_name}")
+    if cert.code.to_i == 200
+      cputs "Success. Certificate found for #{cert_name}"
+    else
+      cputs "Fail. Certificate NOT found for #{cert_name}: #{cert.code}"
+    end
+  end
+end
+
 get_data(@real_nodes, 'User', @user_resources)
 get_data(@real_nodes, 'File', @file_resources)
 get_data(@real_nodes, 'Pe_ini_setting', @ini_resources)
+get_certs(@nrp_certs)
 update_master('ウェブ・グループ',@base_group_default)
