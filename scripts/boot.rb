@@ -308,6 +308,17 @@ def change_classification()
     master_classes
   )
 
+  mco_rules = ["and",["~",["fact","id"],"root|Administrator"],["~",["fact","aio_agent_version"]
+  mco_classes = {
+    'puppet_enterprise::profile::mcollective::agent' => {}
+  }
+
+  update_node_group(
+    "PE MCollective",
+    mco_rules,
+    mco_classes
+  )
+
 end
 
 def update_node_group(node_group,rule,classes)
@@ -375,14 +386,12 @@ def test_class(class_name)
   end
 end
 
-#config_r10k('https://github.com/beergeek/utf_8_test.git')
 resource_manage('file','/etc/puppetlabs/puppet/ssl/private_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0400','content' => "#{@private_key}" })
 resource_manage('file','/etc/puppetlabs/puppet/ssl/public_key.pkcs7.pem',{'ensure' => 'file','owner' => 'pe-puppet','group' => 'pe-puppet', 'mode' => '0644','content' => "#{@public_key}" })
 resource_manage('file','/etc/puppetlabs/puppet/hiera.yaml',{'ensure' => 'file','owner' => 'root','group' => 'root', 'mode' => '0644','content' => "#{@hiera_config}" })
 new_user({ 'login' => 'ジョー','display_name' => 'ジョー','email' => 'ジョー@puppet.com','role_ids' => [1]}, '/root/.puppetlabs')
 deploy_code
 update_master('PE PuppetDB',{ 'puppet_enterprise::profile::puppetdb' => { 'whitelisted_certnames' => ['node1.puppet.vm','node2.puppet.vm'] }})
-update_master('PE Certificate Authority',{ 'puppet_enterprise::profile::certificate_authority' => { 'client_whitelist' => ['master.puppet.vm'] }})
 test_class('role::mom_server')
 test_class('utf_8')
 new_groups()
