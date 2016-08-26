@@ -280,7 +280,7 @@ def new_groups()
   create_group("ウェブ・グループ",'937f05eb-8185-4517-a609-3e64d05191c2',web_group,["or",["=",["trusted","extensions","pp_role"],"ウェブ_サーバ"],["~",["fact","pp_role"],"ウェブ_サーバ"]],"All Nodes")
   #Application Group
   create_group("アプリケーション・グループ",'937f05eb-8185-4517-a609-3e64d05191c1',app_group,["or",["=",["trusted","extensions","pp_role"],"アプリ_サーバ"],["~",["fact","pp_role"],"アプリ_サーバ"]],'All Nodes')
-  #Databse Group
+  #Database Group
   create_group("データベース・グループ",'937f05eb-8185-4517-a609-3e64d05191ca',db_group,["and",["=",["trusted","extensions","pp_role"],"db_サーバ"],["~",["fact","pp_role"],"db_サーバ"]],'All Nodes')
   create_group('Controller','937f05eb-8185-4517-a609-3e64d05191c7',controller_group,["or",["~",["fact","clientcert"],"node2"]],'All Nodes')
   create_group('Repo Server','937f05eb-8185-4517-a609-3e64d05191d7',repo_group,["or",["~",["fact","clientcert"],"node0"]],'All Nodes')
@@ -308,7 +308,7 @@ def change_classification()
     master_classes
   )
 
-  mco_rules = ["and",["~",["fact","id"],"root|Administrator"],["~",["fact","aio_agent_version"]
+  mco_rules = ["and",["~",["fact","id"],"root|Administrator"],["~",["fact","aio_agent_version"]]
   mco_classes = {
     'puppet_enterprise::profile::mcollective::agent' => {}
   }
