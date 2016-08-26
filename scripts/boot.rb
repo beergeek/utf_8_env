@@ -308,7 +308,7 @@ def change_classification()
     master_classes
   )
 
-  mco_rules = ["and",["~",["fact","id"],"root|Administrator"],["~",["fact","aio_agent_version"]]
+  mco_rules = ["and",["~",["fact","id"],"root|Administrator"],["~",["fact","aio_agent_version"]]]
   mco_classes = {
     'puppet_enterprise::profile::mcollective::agent' => {}
   }
