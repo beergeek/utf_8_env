@@ -51,7 +51,8 @@ require 'puppetclassify'
   'HKLM\\\System\\\CurrentControlSet\\\Software\\\Puppet\\\beer\\\japanese\\\ビール\\\beer',
   'HKLM\\\System\\\CurrentControlSet\\\Software\\\Puppet\\\beer\\\flemish\\\bier\\\beer',
   'HKLM\\\System\\\CurrentControlSet\\\Software\\\Puppet\\\beer\\\french\\\bière\\\beer',
-  'HKLM\\\System\\\CurrentControlSet\\\Software\\\Puppet\\\beer\\\russian\\\пиво\\\beer'
+  'HKLM\\\System\\\CurrentControlSet\\\Software\\\Puppet\\\beer\\\russian\\\пиво\\\beer',
+  'HKLM\\\System\\\CurrentControlSet\\\Software\\\Puppet\\\beer\\\russian\\\pipivečkoo\\\beer'
 ]
 
 # Have puppet parse its config so we can call its settings
