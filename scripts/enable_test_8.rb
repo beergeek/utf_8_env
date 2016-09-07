@@ -4,35 +4,37 @@ require 'puppet'
 
 @base_group_default = {
   'role::base' => {
-    "utf_8_notify_string"   => "こんにちは",
-    "ensure_utf_8_concat"   => false,
-    "ensure_utf_8_registry" => false,
-    "ensure_utf_8_exported" => false,
-    "ensure_utf_8_virtual"  => false,
-    "ensure_utf_8_static"   => false,
-    "ensure_utf_8_group"    => false,
-    "ensure_utf_8_files"    => false,
-    "ensure_utf_8_nrp"      => false,
-    "ensure_utf_8_host"     => false,
-    "ensure_utf_8_users"    => false,
-    "ensure_utf_8_lookup"   => false
+    "utf_8_notify_string"    => "こんにちは",
+    "ensure_utf_8_concat"    => false,
+    "ensure_utf_8_registry"  => false,
+    "ensure_utf_8_exported"  => false,
+    "ensure_utf_8_virtual"   => false,
+    "ensure_utf_8_static"    => false,
+    "ensure_utf_8_group"     => false,
+    "ensure_utf_8_files"     => false,
+    "ensure_utf_8_nrp"       => false,
+    "ensure_utf_8_host"      => false,
+    "ensure_utf_8_users"     => false,
+    "ensure_utf_8_lookup"    => false,
+    "ensure_utf_8_functions" => false
   }
 }
 
 @base_this_test = {
 'role::base' => {
-  "utf_8_notify_string"   => "こんにちは",
-  "ensure_utf_8_concat"   => false,
-  "ensure_utf_8_registry" => false,
-  "ensure_utf_8_exported" => false,
-  "ensure_utf_8_virtual"  => false,
-  "ensure_utf_8_static"   => false,
-  "ensure_utf_8_group"    => false,
-  "ensure_utf_8_files"    => false,
-  "ensure_utf_8_nrp"      => true,
-  "ensure_utf_8_host"     => false,
-  "ensure_utf_8_users"    => false,
-  "ensure_utf_8_lookup"   => false
+  "utf_8_notify_string"    => "こんにちは",
+  "ensure_utf_8_concat"    => false,
+  "ensure_utf_8_registry"  => false,
+  "ensure_utf_8_exported"  => false,
+  "ensure_utf_8_virtual"   => false,
+  "ensure_utf_8_static"    => false,
+  "ensure_utf_8_group"     => false,
+  "ensure_utf_8_files"     => false,
+  "ensure_utf_8_nrp"       => true,
+  "ensure_utf_8_host"      => false,
+  "ensure_utf_8_users"     => false,
+  "ensure_utf_8_lookup"    => false,
+  "ensure_utf_8_functions" => false
 }
 }
 
