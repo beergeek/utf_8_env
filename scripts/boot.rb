@@ -178,7 +178,7 @@ def load_classifier_config
   configfile = File.join Puppet.settings[:confdir], 'classifier.yaml'
   if File.exist?(configfile)
     classifier_yaml = YAML.load_file(configfile)
-    @classifier_url = "https://#{classifier_yaml['server']}:#{classifier_yaml['port']}/classifier-api"
+    @classifier_url = "https://#{classifier_yaml[0]['server']}:#{classifier_yaml[0]['port']}/classifier-api"
   else
     Puppet.debug "Config file #{configfile} not found"
     puts "no config file! - wanted #{configfile}"
